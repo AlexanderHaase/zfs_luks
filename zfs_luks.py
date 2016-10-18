@@ -123,8 +123,8 @@ class zol_crypt( object ):
 		self.devices.append( cryptPath )
 
 
-	def configZVOL( self, action, tag, volume ):
-		'''Entry point for the ZVOL config directive'''
+	def configZFS( self, action, tag, volume ):
+		'''Entry point for the ZFS config directive'''
 		self.zpool( action, volume.split( '/' )[ 0 ] )
 
 		volumeExists = os.path.isdir( '/' + volume )
@@ -193,7 +193,7 @@ class zol_crypt( object ):
 			cmd = None
 
 		if cmd:
-			self.runCommand( 'mount', action, [ cmd ] )
+			self.runCommands( 'mount', action, [ cmd ] )
 			self.mounts[ dst ] = src
 
 
@@ -221,7 +221,7 @@ class zol_crypt( object ):
 	def getOrder( self, action ):
 		order = [
 			( 'LUKS', partial( self.configLUKS, action ) ),
-			( 'ZVOL', partial( self.configZVOL, action ) ),
+			( 'ZFS', partial( self.configZFS, action ) ),
 			( 'Mount', partial( self.configMount, action ) ),
 			]
 
@@ -229,8 +229,8 @@ class zol_crypt( object ):
 			pass
 
 		elif( action == self.CLOSE ):
-			# parse zvol tags without action
-			order.append( ( 'ZVOL', partial( self.configZVOL, None ) ) )
+			# parse zfs tags without action
+			order.append( ( 'ZFS', partial( self.configZFS, None ) ) )
 			order.reverse()
 
 		else:
