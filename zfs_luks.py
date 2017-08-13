@@ -132,6 +132,7 @@ class zol_crypt( object ):
 		if( action == self.CREATE and not volumeExists ):
 			self.runCommands( 'zfs', action, [ ( 'zfs', 'create', volume ) ] )
 
+		logger.debug( "zfs: adding tag '{}' for '{}'".format( tag, volume ) )
 		self.defines[ tag ] = '/' + volume
 
 
@@ -161,12 +162,13 @@ class zol_crypt( object ):
 
 	def configMount( self, action, src, dst, mkdirs ):
 		'''Entry point for mounting--generate paths using defines'''
-		history = {}
 
 		if '{user}' in src or '{user}' in dst:
 			users = self.users
 		else:
 			users = [ 'root' ]
+
+		logger.debug( "mount {}: current defines: {}".format( action, self.defines ) )
 
 		consume( itertools.imap( partial( self.mountUser, action, src, dst, mkdirs ), users ) )
 
